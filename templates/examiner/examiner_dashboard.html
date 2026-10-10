@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Examiner Dashboard</h2>
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card bg-white shadow-sm border-start border-primary border-4">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase">Created Slots</h6>
+                <h3 class="mb-0">{{ stats.created_slots }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-white shadow-sm border-start border-success border-4">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase">Booked Students</h6>
+                <h3 class="mb-0">{{ stats.booked_students }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-white shadow-sm border-start border-warning border-4">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase">Pending Evaluations</h6>
+                <h3 class="mb-0">{{ stats.pending_evaluations }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="d-grid gap-2 d-md-flex justify-content-md-start">
+    <button class="btn btn-primary me-md-2" type="button">Manage Slots</button>
+    <button class="btn btn-outline-primary" type="button">Evaluate Students</button>
+</div>
+{% endblock %}

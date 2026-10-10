@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Student Dashboard</h2>
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card bg-white shadow-sm border-start border-info border-4">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase">Available Examinations</h6>
+                <h3 class="mb-0">{{ stats.available_examinations }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-white shadow-sm border-start border-primary border-4">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase">My Booked Slots</h6>
+                <h3 class="mb-0">{{ stats.booked_slots }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-white shadow-sm border-start border-success border-4">
+            <div class="card-body">
+                <h6 class="text-muted text-uppercase">Published Results</h6>
+                <h3 class="mb-0">{{ stats.published_results }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mb-3">My Bookings</h4>
+<div class="table-responsive bg-white shadow-sm p-3 rounded">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr>
+                <td>#{{ booking.booking_id }}</td>
+                <td>{{ booking.booking_date.strftime('%Y-%m-%d') }}</td>
+                <td><span class="badge bg-primary">{{ booking.status }}</span></td>
+                <td>
+                    {% if booking.status == 'Booked' %}
+                    <button class="btn btn-sm btn-danger">Cancel Booking</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-muted">You have no upcoming bookings.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

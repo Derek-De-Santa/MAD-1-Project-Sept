@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Admin Dashboard</h2>
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Courses & Exams</h5>
+                <p class="card-text fs-4">{{ stats.total_courses }} Courses | {{ stats.total_examinations }} Exams</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Users</h5>
+                <p class="card-text fs-4">{{ stats.total_students }} Students | {{ stats.total_examiners }} Examiners</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-warning shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Slots & Bookings</h5>
+                <p class="card-text fs-4">{{ stats.total_slots }} Slots | {{ stats.total_bookings }} Bookings</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="mb-3">Pending Examiner Approvals</h4>
+<div class="table-responsive bg-white shadow-sm p-3 rounded">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Contact</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for examiner in pending_examiners %}
+            <tr>
+                <td>{{ examiner.name }}</td>
+                <td>{{ examiner.department }}</td>
+                <td>{{ examiner.contact_details }}</td>
+                <td>
+                    <button class="btn btn-sm btn-success">Approve</button>
+                    <button class="btn btn-sm btn-danger">Reject</button>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-muted">No pending approvals.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
