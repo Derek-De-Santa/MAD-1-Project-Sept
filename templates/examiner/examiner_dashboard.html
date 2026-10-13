@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2 class="mb-4">Examiner Dashboard</h2>
-<div class="row g-4 mb-4">
+
+<!-- Dashboard Statistics -->
+<div class="row g-4 mb-5">
     <div class="col-md-4">
         <div class="card bg-white shadow-sm border-start border-primary border-4">
             <div class="card-body">
@@ -28,8 +30,51 @@
     </div>
 </div>
 
-<div class="d-grid gap-2 d-md-flex justify-content-md-start">
-    <button class="btn btn-primary me-md-2" type="button">Manage Slots</button>
-    <button class="btn btn-outline-primary" type="button">Evaluate Students</button>
+<!-- Assigned Examinations Section -->
+<h4 class="mb-3">My Assigned Examinations</h4>
+<div class="table-responsive bg-white shadow-sm p-3 rounded">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Examination Name</th>
+                <th>Course Code</th>
+                <th>Type</th>
+                <th>System Status</th>
+                <th>Slot Creation Window</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exam in assigned_exams %}
+            <tr>
+                <td><strong>{{ exam.exam_name }}</strong><br><small class="text-muted">{{ exam.duration }} mins | {{ exam.max_marks }} marks</small></td>
+                <td>{{ exam.course.course_code }}</td>
+                <td>{{ exam.exam_type }}</td>
+                <td>
+                    {% if exam.status == 'Draft' %}
+                        <span class="badge bg-secondary">{{ exam.status }}</span>
+                    {% elif exam.status == 'Slot Creation' %}
+                        <span class="badge bg-success">{{ exam.status }}</span>
+                    {% elif exam.status == 'Booking Open' %}
+                        <span class="badge bg-info text-dark">{{ exam.status }}</span>
+                    {% else %}
+                        <span class="badge bg-dark">{{ exam.status }}</span>
+                    {% endif %}
+                </td>
+                <td style="font-size: 0.85em;">
+                    <strong>Starts:</strong> {{ exam.slot_creation_start_date.strftime('%Y-%m-%d %H:%M') }}<br>
+                    <strong>Ends:</strong> {{ exam.slot_creation_end_date.strftime('%Y-%m-%d %H:%M') }}
+                </td>
+                <td>
+                    <!-- Link to slot management route -->
+                    <a href="{{ url_for('manage_slots', exam_id=exam.exam_id) }}" class="btn btn-sm btn-primary w-100">Manage Slots</a>
+                    <a href="{{ url_for('view_students', exam_id=exam.exam_id) }}" class="btn btn-sm btn-outline-secondary w-100 mt-1">View Students</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="text-center text-muted">You have no assigned examinations yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

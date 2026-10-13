@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('student_dashboard') }}" class="text-decoration-none">&larr; Back to Dashboard</a>
+    <h2 class="mt-2">Available Slots: {{ exam.exam_name }}</h2>
+    <p class="text-muted">{{ exam.course.course_code }} - {{ exam.course.course_name }} | Max Marks: {{ exam.max_marks }}</p>
+</div>
+
+{% if existing_booking %}
+<div class="alert alert-warning shadow-sm border-0">
+    <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Already Booked</h5>
+    <p class="mb-0">You have already booked a slot for this examination on <strong>{{ existing_booking.slot.date.strftime('%b %d, %Y') }} at {{ existing_booking.slot.start_time.strftime('%H:%M') }}</strong>. Multiple bookings for the same exam are not permitted.</p>
+</div>
+{% endif %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Date</th>
+                        <th>Time Window</th>
+                        <th>Examiner</th>
+                        <th>Availability</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for slot in slots %}
+                    <tr>
+                        <td><strong>{{ slot.date.strftime('%b %d, %Y') }}</strong></td>
+                        <td>{{ slot.start_time.strftime('%H:%M') }} - {{ slot.end_time.strftime('%H:%M') }}</td>
+                        <td>{{ slot.examiner.examiner_profile.name }}</td>
+                        <td>
+                            {% if slot.available_seats > 0 %}
+                                <span class="badge bg-success">{{ slot.available_seats }} Seats Left</span>
+                            {% else %}
+                                <span class="badge bg-danger">Full</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <!-- Booking Form -->
+                            <form action="{{ url_for('book_slot', slot_id=slot.slot_id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-primary" 
+                                    {% if slot.available_seats == 0 or existing_booking or exam.status != 'Booking Open' %}disabled{% endif %}>
+                                    Book Slot
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-5">
+                            No slots have been created for this examination yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

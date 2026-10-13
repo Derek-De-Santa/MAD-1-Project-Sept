@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2 class="mb-4">Admin Dashboard</h2>
+
+<!-- Statistics Section -->
 <div class="row g-4 mb-4">
     <div class="col-md-4">
         <div class="card text-white bg-primary shadow-sm">
@@ -28,10 +30,30 @@
     </div>
 </div>
 
+<!-- NEW: Quick Actions Section -->
+<h4 class="mb-3">Quick Actions</h4>
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-body bg-white rounded">
+        <div class="d-flex flex-wrap gap-2">
+            <!-- Navigation buttons to Admin functionalities -->
+
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('manage_courses') }}" class="btn btn-outline-primary">Manage Courses</a>
+                <a href="{{ url_for('manage_examinations') }}" class="btn btn-outline-primary">Manage Examinations</a>
+    
+                <!-- NEW: Replaced the disabled buttons with these active links -->
+                <a href="{{ url_for('manage_records') }}" class="btn btn-outline-dark">View All Slots & Bookings</a>
+                <a href="{{ url_for('manage_records') }}" class="btn btn-outline-dark"><i class="bi bi-search"></i> Search Portal</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Approvals Section -->
 <h4 class="mb-3">Pending Examiner Approvals</h4>
 <div class="table-responsive bg-white shadow-sm p-3 rounded">
     <table class="table table-hover">
-        <thead>
+        <thead class="table-light">
             <tr>
                 <th>Name</th>
                 <th>Department</th>
@@ -46,8 +68,15 @@
                 <td>{{ examiner.department }}</td>
                 <td>{{ examiner.contact_details }}</td>
                 <td>
-                    <button class="btn btn-sm btn-success">Approve</button>
-                    <button class="btn btn-sm btn-danger">Reject</button>
+                    <!-- Approve Form -->
+                    <form action="{{ url_for('approve_examiner', profile_id=examiner.examiner_id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                    </form>
+                    
+                    <!-- Reject Form -->
+                    <form action="{{ url_for('reject_examiner', profile_id=examiner.examiner_id) }}" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to reject and delete this request?');">Reject</button>
+                    </form>
                 </td>
             </tr>
             {% else %}

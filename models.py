@@ -5,6 +5,13 @@ from datetime import datetime, timezone
 
 db = SQLAlchemy()
 
+
+exam_assignments = db.Table('exam_assignments',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('exam_id', db.Integer, db.ForeignKey('examinations.exam_id'), primary_key=True)
+)
+
+
 class User(db.Model, UserMixin):
     """
     Handles authentication and role-based access for Admin, Examiners, and Students.
@@ -73,7 +80,8 @@ class Examination(db.Model):
     # Relationships
     rubrics = db.relationship('ExaminationRubric', backref='examination', lazy=True, cascade="all, delete-orphan")
     slots = db.relationship('ExaminationSlot', backref='examination', lazy=True, cascade="all, delete-orphan")
-
+    assigned_examiners = db.relationship('User', secondary=exam_assignments, lazy='subquery',
+        backref=db.backref('assigned_exams', lazy=True))
 class ExaminationRubric(db.Model):
     """
     Defines the evaluation criteria for an examination.

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>System Records</h2>
+    
+    <!-- Contextual Search Bar -->
+    <form action="{{ url_for('manage_records') }}" method="GET" class="d-flex w-50">
+        <input type="text" name="q" class="form-control me-2" placeholder="Search student, examiner, or exam..." value="{{ query }}">
+        <button type="submit" class="btn btn-dark">Search</button>
+        {% if query %}
+            <a href="{{ url_for('manage_records') }}" class="btn btn-outline-secondary ms-2">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+{% if query %}
+    <div class="alert alert-info shadow-sm border-0">
+        Showing filtered results for "<strong>{{ query }}</strong>".
+    </div>
+{% endif %}
+
+<!-- Tabs always visible -->
+<ul class="nav nav-tabs mb-4" id="recordsTabs">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#bookingsTab">Bookings ({{ bookings|length }})</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#slotsTab">Examination Slots ({{ slots|length }})</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- ALL BOOKINGS TAB -->
+    <div class="tab-pane fade show active" id="bookingsTab">
+        <div class="table-responsive bg-white shadow-sm p-3 rounded">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Student</th>
+                        <th>Examination</th>
+                        <th>Current Slot (Date & Time)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>#{{ booking.booking_id }}</td>
+                        <td><strong>{{ booking.student.username }}</strong></td>
+                        <td>{{ booking.slot.examination.exam_name }}</td>
+                        <td>{{ booking.slot.date.strftime('%b %d, %Y') }} at {{ booking.slot.start_time.strftime('%H:%M') }}</td>
+                        <td><span class="badge bg-secondary">{{ booking.status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center text-muted">No matching bookings found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ALL SLOTS TAB -->
+    <div class="tab-pane fade" id="slotsTab">
+        <div class="table-responsive bg-white shadow-sm p-3 rounded">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Slot ID</th>
+                        <th>Examination</th>
+                        <th>Examiner</th>
+                        <th>Date & Time</th>
+                        <th>Capacity Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for slot in slots %}
+                    <tr>
+                        <td>#{{ slot.slot_id }}</td>
+                        <td><strong>{{ slot.examination.exam_name }}</strong></td>
+                        <td>{{ slot.examiner.examiner_profile.name }}</td>
+                        <td>{{ slot.date.strftime('%b %d, %Y') }} ({{ slot.start_time.strftime('%H:%M') }} - {{ slot.end_time.strftime('%H:%M') }})</td>
+                        <td>
+                            {% if slot.status == 'Available' %}
+                                <span class="badge bg-success">{{ slot.available_seats }} / {{ slot.max_student_capacity }} left</span>
+                            {% else %}
+                                <span class="badge bg-danger">Full</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center text-muted">No matching slots found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2 class="mb-4">Student Dashboard</h2>
-<div class="row g-4 mb-4">
+
+<!-- Dashboard Statistics -->
+<div class="row g-4 mb-5">
     <div class="col-md-4">
         <div class="card bg-white shadow-sm border-start border-info border-4">
             <div class="card-body">
@@ -28,33 +30,103 @@
     </div>
 </div>
 
-<h4 class="mb-3">My Bookings</h4>
-<div class="table-responsive bg-white shadow-sm p-3 rounded">
-    <table class="table table-hover">
-        <thead>
-            <tr>
-                <th>Booking ID</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for booking in bookings %}
-            <tr>
-                <td>#{{ booking.booking_id }}</td>
-                <td>{{ booking.booking_date.strftime('%Y-%m-%d') }}</td>
-                <td><span class="badge bg-primary">{{ booking.status }}</span></td>
-                <td>
-                    {% if booking.status == 'Booked' %}
-                    <button class="btn btn-sm btn-danger">Cancel Booking</button>
-                    {% endif %}
-                </td>
-            </tr>
-            {% else %}
-            <tr><td colspan="4" class="text-center text-muted">You have no upcoming bookings.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="row g-4">
+    <!-- Available Examinations Section -->
+    <div class="col-lg-12 mb-4">
+        <h4 class="mb-3">Available Examinations</h4>
+        <div class="table-responsive bg-white shadow-sm p-3 rounded">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Examination Name</th>
+                        <th>Course</th>
+                        <th>Type</th>
+                        <th>Booking Deadline</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for exam in available_exams %}
+                    <tr>
+                        <td><strong>{{ exam.exam_name }}</strong><br><small class="text-muted">{{ exam.duration }} mins | {{ exam.max_marks }} marks</small></td>
+                        <td>{{ exam.course.course_code }}</td>
+                        <td>{{ exam.exam_type }}</td>
+                        <td>{{ exam.slot_booking_end_date.strftime('%b %d, %Y - %H:%M') }}</td>
+                        <td>
+                            <!-- Link to slot booking route -->
+                            <a href="{{ url_for('view_exam_slots', exam_id=exam.exam_id) }}" class="btn btn-sm btn-primary">View & Book Slots</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">No examinations are currently open for booking.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Booking History Section -->
+    <div class="col-lg-12">
+        <h4 class="mb-3">My Booking History</h4>
+        <div class="table-responsive bg-white shadow-sm p-3 rounded">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Examination</th>
+                        <th>Slot Date & Time</th>
+                        <th>Examiner</th>
+                        <th>Status</th>
+                        <th>Action / Results</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>#{{ booking.booking_id }}</td>
+                        <td><strong>{{ booking.slot.examination.exam_name }}</strong></td>
+                        <td>
+                            {{ booking.slot.date.strftime('%b %d, %Y') }}<br>
+                            <small class="text-muted">{{ booking.slot.start_time.strftime('%H:%M') }} - {{ booking.slot.end_time.strftime('%H:%M') }}</small>
+                        </td>
+                        <td>{{ booking.slot.examiner.examiner_profile.name }}</td>
+                        <td>
+                            {% if booking.status == 'Booked' %}
+                                <span class="badge bg-primary">{{ booking.status }}</span>
+                            {% elif booking.status == 'Cancelled' %}
+                                <span class="badge bg-danger">{{ booking.status }}</span>
+                            {% else %}
+                                <span class="badge bg-success">{{ booking.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <!-- Cancel booking form (only if status is Booked) -->
+                            {% if booking.status == 'Booked' %}
+                                <form action="{{ url_for('cancel_booking', booking_id=booking.booking_id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to cancel this booking?');">Cancel</button>
+                                </form>
+        
+                            <!-- NEW LOGIC: Only show results if the status is Completed -->
+                            {% elif booking.status == 'Completed' %}
+                                <a href="{{ url_for('view_results', booking_id=booking.booking_id) }}" class="btn btn-sm btn-success w-100">View Results</a>
+        
+                            {% elif booking.status == 'Cancelled' %}
+                                <span class="text-muted small">Cancelled</span>
+                            {% else %}
+                                <span class="text-muted small">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">You have not booked any examination slots yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

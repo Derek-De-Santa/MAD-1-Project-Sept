@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('view_students', exam_id=booking.slot.examination_id) }}" class="text-decoration-none">&larr; Back to Students</a>
+    <h2 class="mt-2">Evaluate Student: {{ booking.student.username }}</h2>
+    <p class="text-muted">
+        Examination: <strong>{{ booking.slot.examination.exam_name }}</strong> | 
+        Slot: <strong>{{ booking.slot.date.strftime('%b %d, %Y') }} at {{ booking.slot.start_time.strftime('%H:%M') }}</strong>
+    </p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-success text-white py-3">
+                <h5 class="mb-0">Evaluation Rubrics</h5>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ url_for('evaluate_student', booking_id=booking.booking_id) }}" method="POST">
+                    
+                    {% for rubric in rubrics %}
+                    <div class="mb-4 pb-4 {% if not loop.last %}border-bottom{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="fw-bold mb-0 text-primary">{{ rubric.criterion_name }}</h5>
+                            <span class="badge bg-secondary">Max Marks: {{ rubric.max_marks }} (Weight: {{ rubric.weightage }}%)</span>
+                        </div>
+                        {% if rubric.description %}
+                            <p class="text-muted small mb-3">{{ rubric.description }}</p>
+                        {% endif %}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Marks Awarded</label>
+                                <input type="number" step="0.5" min="0" max="{{ rubric.max_marks }}" name="marks_{{ rubric.rubric_id }}" 
+                                       class="form-control border-success" required
+                                       value="{{ existing_evals[rubric.rubric_id].marks_awarded if rubric.rubric_id in existing_evals else '' }}">
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label">Remarks / Feedback (Optional)</label>
+                                <input type="text" name="remarks_{{ rubric.rubric_id }}" class="form-control" placeholder="Provide specific feedback..."
+                                       value="{{ existing_evals[rubric.rubric_id].remarks if rubric.rubric_id in existing_evals else '' }}">
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    <div class="alert alert-info d-flex align-items-center mt-2">
+                        <i class="bi bi-info-circle-fill me-3 fs-4"></i>
+                        <div>
+                            Once submitted, these marks and remarks will be published to the student's dashboard.
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success btn-lg w-100 mt-2">{% if existing_evals %}Update Evaluation{% else %}Submit Final Evaluation{% endif %}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('student_dashboard') }}" class="text-decoration-none">&larr; Back to Dashboard</a>
+    <h2 class="mt-2">Examination Results: {{ booking.slot.examination.exam_name }}</h2>
+    <p class="text-muted">
+        Course: <strong>{{ booking.slot.examination.course.course_code }}</strong> | 
+        Evaluator: <strong>{{ booking.slot.examiner.examiner_profile.name }}</strong>
+    </p>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <!-- Summary Score Card -->
+        <div class="card shadow-sm border-0 bg-primary text-white text-center h-100">
+            <div class="card-body d-flex flex-column justify-content-center py-5">
+                <h5 class="text-uppercase mb-3">Total Score</h5>
+                <h1 class="display-3 fw-bold mb-0">{{ total_marks_awarded }}</h1>
+                <p class="fs-5 mt-2 mb-0">out of {{ total_max_marks }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">Detailed Feedback</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Evaluation Criterion</th>
+                                <th class="text-center">Marks Awarded</th>
+                                <th>Examiner Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for evaluation in booking.evaluations %}
+                            <tr>
+                                <td>
+                                    <strong>{{ evaluation.rubric.criterion_name }}</strong><br>
+                                    <small class="text-muted">Weight: {{ evaluation.rubric.weightage }}%</small>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success fs-6">{{ evaluation.marks_awarded }} / {{ evaluation.rubric.max_marks }}</span>
+                                </td>
+                                <td>
+                                    {% if evaluation.remarks %}
+                                        <i>"{{ evaluation.remarks }}"</i>
+                                    {% else %}
+                                        <span class="text-muted small">No remarks provided.</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
